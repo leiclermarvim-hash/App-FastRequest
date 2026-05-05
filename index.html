@@ -210,6 +210,13 @@
     const GITHUB_USERS = "https://raw.githubusercontent.com/leiclermarvim-hash/URL_USUARIOS_GITHUB/refs/heads/main/URL_USUARIOS_GITHUB.csv";
     const GITHUB_MATS = "https://raw.githubusercontent.com/leiclermarvim-hash/URL_USUARIOS_GITHUB/refs/heads/main/URL_MATERIAIS_GITHUB.csv";
 
+    // Fechar resultados de busca ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-results') && !e.target.closest('input')) {
+            document.querySelectorAll('.search-results').forEach(d => d.style.display = 'none');
+        }
+    });
+
     window.onload = () => {
         const h = localStorage.getItem('fast_request_history');
         if(h) historico = JSON.parse(h);
@@ -317,6 +324,12 @@
         const numSerie = document.getElementById('trafo_serie').value;
         const itemAdm = document.getElementById('item_is_adm').value;
 
+        // Validação de quantidade
+        if (!qtdRaw || qtdRaw === "0" || qtdRaw === "0,0") {
+            alert("Informe uma quantidade válida.");
+            return;
+        }
+
         const duplicado = listaSolicitacao.some(item => item.cod === cod);
         if(duplicado) { alert("Este item já foi adicionado!"); return; }
 
@@ -397,7 +410,16 @@
                 </div>
                 <table class="hist-table">
                     <thead><tr style="background:#dee2e6"><th style="width:25%">Cod</th><th>Descrição / ADM</th><th style="width:15%">Qtd</th></tr></thead>
-                    <tbody>${h.itens.map(it => `<tr><td>${it.cod}</td><td>${it.desc} <br><small><b>ADM:</b> ${it.adm || 'Não'}</small></td><td style="text-align:center"><b>${it.qtd}</b></td></tr>`).join('')}</tbody>
+                    <tbody>${h.itens.map(it => `
+                        <tr>
+                            <td>${it.cod}</td>
+                            <td>
+                                ${it.desc} 
+                                ${it.adm === 'Sim' ? '<br><span style="color:#d97706; font-weight:bold; font-size:9px;">⚠️ ITEM ADM</span>' : ''}
+                            </td>
+                            <td style="text-align:center"><b>${it.qtd}</b></td>
+                        </tr>`).join('')}
+                    </tbody>
                 </table>
                 <div class="hist-actions">
                     <button class="btn-hist btn-h-wa" onclick="reutilizarWA(${index})">WhatsApp</button>
@@ -417,7 +439,6 @@
             const mov = h.movim.toUpperCase();
             if (mov.includes("ESTORNO")) qtdFinal = qtdFinal * -1;
 
-            // Ajuste na descrição para a planilha
             let descPlanilha = item.desc;
             if (item.adm === "Sim") {
                 descPlanilha += " (MATERIAL ADM)";
