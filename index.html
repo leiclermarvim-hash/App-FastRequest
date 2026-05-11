@@ -510,7 +510,7 @@
         
         msg += h.itens.map(m => {
             const tagAdm = m.adm === "Sim" ? " *(ADM)*" : "";
-            return `${m.cod} - ${m.desc}${tagAdm} (-${m.qtd})`;
+            return `${m.cod} - ${m.desc}${tagAdm} - ${m.qtd}`;
         }).join('%0A');
         
         window.open(`https://wa.me/?text=${msg}`, '_blank');
